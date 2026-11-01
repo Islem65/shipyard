@@ -1,0 +1,45 @@
+#services : indique les services que Docker Compose doit lancer
+services:
+  #(1)le service de la base de donnée 
+  db:
+  #Cela signifie que Docker utilise l'image officielle de PostgreSQL en version 16.
+    image: postgres:16
+    #Si le conteneur s'arrête de manière inattendue, Docker essaie de le redémarrer. Il ne le redémarre pas automatiquement si tu l'as explicitement arrêté.
+    restart: unless-stopped
+    #environment transmet des variables d'environnement au conteneur PostgreSQL.
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      #Si tu supprimes puis recrées le conteneur, les données peuvent être conservées dans le volume, au lieu de disparaître avec le conteneur. Attention, supprimer ce volume peut supprimer les données qu'il contient.
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      #Vérifier que PostgreSQL est prêt
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      #vérifie toutes les 5 secondes.
+      interval: 5s
+      #attend au maximum 5 secondes pour chaque vérification.
+      timeout: 5s
+      #après plusieurs échecs consécutifs, le contrôle peut déclarer le service comme non sain.
+      retries: 5
+
+  #(2)le service du back
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - ./backend/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  

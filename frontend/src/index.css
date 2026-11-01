@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-bg: #07080c;
+  --color-surface: #0d0f16;
+  --color-surface-2: #131622;
+  --color-line: #1d2132;
+  --color-ink: #f4f5f9;
+  --color-muted: #8b91a7;
+  --color-accent: #7c6cff;
+  --color-accent-2: #35d0ff;
+  --color-ok: #3ddc97;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-ticker: ticker 28s linear infinite;
+  --animate-aurora: aurora 14s ease-in-out infinite;
+  --animate-aurora-slow: aurora 20s ease-in-out infinite reverse;
+  --animate-shimmer: shimmer 2.6s linear infinite;
+  --animate-blink: blink 1s steps(2) infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes ticker {
+  to { transform: translateX(-50%); }
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fond quadrillé + halo lumineux du hero */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--color-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 75%);
+}
+.glow {
+  background: radial-gradient(closest-side, rgb(124 108 255 / 0.35), transparent);
+}
+.text-gradient {
+  background: linear-gradient(90deg, #fff 20%, var(--color-accent-2) 60%, var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Apparition au scroll */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+@keyframes aurora {
+  0%, 100% { transform: translate(-50%, 0) scale(1); }
+  33% { transform: translate(-42%, 24px) scale(1.12); }
+  66% { transform: translate(-58%, -12px) scale(0.94); }
+}
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+/* Bordure dégradée qui tourne autour de la carte */
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes spin-angle {
+  to { --angle: 360deg; }
+}
+.border-spin {
+  position: relative;
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    conic-gradient(from var(--angle), var(--color-accent), var(--color-accent-2), transparent 40%, var(--color-accent)) border-box;
+  border: 1px solid transparent;
+  animation: spin-angle 6s linear infinite;
+}
+
+/* Bouton avec reflet qui défile */
+.btn-shimmer {
+  background-image: linear-gradient(110deg, var(--color-accent) 20%, #b6adff 40%, var(--color-accent-2) 60%, var(--color-accent) 80%);
+  background-size: 200% 100%;
+  animation: shimmer 2.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}

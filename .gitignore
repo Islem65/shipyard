@@ -1,0 +1,16 @@
+# Secrets : ne jamais envoyer en ligne
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node / frontend
+node_modules/
+dist/
+
+# Éditeur et système
+.vscode/
+.DS_Store
